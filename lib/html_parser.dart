@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:csslib/visitor.dart' as css;
 import 'package:html/dom.dart' as dom;
 import 'package:flutter_html/src/html_elements.dart';
+import 'package:flutter_html/custom_element_replacer.dart';
 import 'package:html/parser.dart' as htmlparser;
 import 'package:csslib/parser.dart' as cssparser;
 
@@ -14,19 +15,21 @@ class HtmlParser extends StatelessWidget {
   final String cssData;
   final OnLinkTap onLinkTap;
   final Map<String, Style> style;
+  final CustomElementReplacer customElementReplacer;
 
-  HtmlParser({
-    @required this.htmlData,
-    @required this.cssData,
-    this.onLinkTap,
-    this.style,
-  });
+  HtmlParser(
+      {@required this.htmlData,
+      @required this.cssData,
+      this.onLinkTap,
+      this.style,
+      this.customElementReplacer});
 
   @override
   Widget build(BuildContext context) {
     dom.Document document = parseHTML(htmlData);
     css.StyleSheet sheet = parseCSS(cssData);
-    StyledElement lexedTree = lexDomTree(document);
+    StyledElement lexedTree =
+        lexDomTree(document, customElementReplacer: customElementReplacer);
     StyledElement styledTree = applyCSS(lexedTree, sheet);
     StyledElement inlineStyledTree = applyInlineStyles(styledTree);
     StyledElement customStyledTree = _applyCustomStyles(inlineStyledTree);
@@ -50,7 +53,8 @@ class HtmlParser extends StatelessWidget {
   }
 
   /// [lexDomTree] converts a DOM document to a simplified tree of [StyledElement]s.
-  static StyledElement lexDomTree(dom.Document html) {
+  static StyledElement lexDomTree(dom.Document html,
+      {CustomElementReplacer customElementReplacer = null}) {
     StyledElement tree = StyledElement(
       name: "[Tree Root]",
       children: new List<StyledElement>(),
@@ -58,18 +62,19 @@ class HtmlParser extends StatelessWidget {
     );
 
     html.nodes.forEach((node) {
-      tree.children.add(_recursiveLexer(node));
+      tree.children.add(_recursiveLexer(node, customElementReplacer));
     });
 
     return tree;
   }
 
   //TODO(Sub6Resources): Apply inline styles
-  static StyledElement _recursiveLexer(dom.Node node) {
+  static StyledElement _recursiveLexer(
+      dom.Node node, CustomElementReplacer customElementReplacer) {
     List<StyledElement> children = List<StyledElement>();
 
     node.nodes.forEach((childNode) {
-      children.add(_recursiveLexer(childNode));
+      children.add(_recursiveLexer(childNode, customElementReplacer));
     });
 
     if (node is dom.Element) {
@@ -81,6 +86,9 @@ class HtmlParser extends StatelessWidget {
         return parseBlockElement(node, children);
       } else if (REPLACED_ELEMENTS.contains(node.localName)) {
         return parseReplacedElement(node);
+      } else if (customElementReplacer != null &&
+          customElementReplacer.shouldProcess(node.localName)) {
+        return customElementReplacer.parse(node, children);
       } else {
         return EmptyContentElement();
       }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_html/src/html_elements.dart';
+import 'package:flutter_html/custom_element_replacer.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/html_parser.dart';
+import 'package:flutter_html/src/html_elements.dart';
 import 'package:flutter_html/style.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:html/dom.dart' as dom;
 
 void main() {
   testWidgets("Check that default parser does not fail on empty data",
@@ -121,5 +123,21 @@ void testNewParser() {
     expect(finalStyle.textDirection, equals(TextDirection.rtl));
     expect(finalStyle.fontStyle, equals(FontStyle.italic));
     expect(finalStyle.fontWeight, equals(FontWeight.bold));
+  });
+
+  test("Custome Element Replacer", () {
+    final replacer = CustomElementReplacer();
+    replacer.addCustomElement("custom-tag",
+        (dom.Element element, List<StyledElement> children) {
+      return StyledElement(
+        name: "custom-tag",
+        children: children,
+        node: element,
+      );
+    });
+    final parser = HtmlParser.lexDomTree(
+        HtmlParser.parseHTML("<custom-tag>hoge</custom-tag>"),
+        customElementReplacer: replacer);
+    print(parser);
   });
 }
