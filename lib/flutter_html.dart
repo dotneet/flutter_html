@@ -5,6 +5,7 @@ import 'package:flutter_html/html_parser.dart';
 import 'package:flutter_html/rich_text_parser.dart';
 import 'package:flutter_html/style.dart';
 import 'image_properties.dart';
+import 'custom_element_replacer.dart';
 
 class Html extends StatelessWidget {
   Html({
@@ -17,6 +18,7 @@ class Html extends StatelessWidget {
     this.onLinkTap,
     this.renderNewlines = false,
     this.customRender,
+    this.customElementReplacer,
     @deprecated this.customEdgeInsets,
     @deprecated this.customTextStyle,
     @deprecated this.blockSpacing = 14.0,
@@ -54,6 +56,8 @@ class Html extends StatelessWidget {
   final CustomRender customRender;
   final CustomEdgeInsets customEdgeInsets;
   final CustomTextStyle customTextStyle;
+
+  final CustomElementReplacer customElementReplacer;
 
   /// Fancy New Parser parameters
   final Map<String, Style> style;
@@ -94,6 +98,7 @@ class Html extends StatelessWidget {
           cssData: css,
           onLinkTap: onLinkTap,
           style: style,
+          customElementReplacer: customElementReplacer,
         ));
   }
 }
