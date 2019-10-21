@@ -1,6 +1,5 @@
 export 'styled_element.dart';
 export 'interactable_element.dart';
-export 'package:flutter_html/src/block_element.dart';
 export 'replaced_element.dart';
 
 const STYLED_ELEMENTS = [
@@ -39,13 +38,8 @@ const STYLED_ELEMENTS = [
   "u",
   "var",
   "wbr",
-];
 
-const INTERACTABLE_ELEMENTS = [
-  "a",
-];
-
-const BLOCK_ELEMENTS = [
+  //BLOCK ELEMENTS
   "article",
   "aside",
   "blockquote",
@@ -75,28 +69,31 @@ const BLOCK_ELEMENTS = [
   "p",
   "pre",
   "section",
-  "table",
-  "tbody",
-  "tfoot",
-  "thead",
   "ul",
+];
+
+const INTERACTABLE_ELEMENTS = [
+  "a",
 ];
 
 const REPLACED_ELEMENTS = [
   "audio",
   "br",
   "head",
-  "img", //TODO display inline
+  "iframe",
+  "img",
+  "svg",
   "template",
   "video",
 ];
 
-enum ElementType {
-  REPLACED,
-  INLINE,
-  BLOCK,
-  INTERACTABLE,
-}
+const LAYOUT_ELEMENTS = [
+  "table",
+  "tr",
+  "tbody",
+  "tfoot",
+  "thead",
+];
 
 /**
   Here is a list of elements with planned support:
@@ -167,7 +164,7 @@ enum ElementType {
     strong    - s [x]
     sub       - s [x]
     sup       - s [x]
-    svg       - c [ ]
+    svg       - c [x]
     table     - b [x]
     tbody     - b [x]
     td        - s [ ]

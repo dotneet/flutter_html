@@ -13,24 +13,27 @@ class Html extends StatelessWidget {
     @required this.data,
     this.css = "",
     @deprecated this.padding,
-    this.backgroundColor,
+    @deprecated this.backgroundColor,
     @deprecated this.defaultTextStyle,
     this.onLinkTap,
-    this.renderNewlines = false,
+    @deprecated this.renderNewlines = false, //TODO(Sub6Resources): Document alternatives
     this.customRender,
     this.customElementReplacer,
     @deprecated this.customEdgeInsets,
     @deprecated this.customTextStyle,
     @deprecated this.blockSpacing = 14.0,
     @deprecated this.useRichText = false,
+    @deprecated this.customTextAlign,
     this.onImageError,
     @deprecated this.linkStyle = const TextStyle(
         decoration: TextDecoration.underline,
         color: Colors.blueAccent,
         decorationColor: Colors.blueAccent),
+    this.shrinkToFit = false,
     this.imageProperties,
     this.onImageTap,
-    this.showImages = true,
+    @deprecated this.showImages = true,
+    this.blacklistedElements = const [],
     this.style,
   }) : super(key: key);
 
@@ -45,17 +48,21 @@ class Html extends StatelessWidget {
   final bool useRichText;
   final ImageErrorListener onImageError;
   final TextStyle linkStyle;
+  final bool shrinkToFit;
 
   /// Properties for the Image widget that gets rendered by the rich text parser
   final ImageProperties imageProperties;
   final OnImageTap onImageTap;
   final bool showImages;
 
+  final List<String> blacklistedElements;
+
   /// Either return a custom widget for specific node types or return null to
   /// fallback to the default rendering.
-  final CustomRender customRender;
+  final Map<String, CustomRender> customRender;
   final CustomEdgeInsets customEdgeInsets;
   final CustomTextStyle customTextStyle;
+  final CustomTextAlign customTextAlign;
 
   final CustomElementReplacer customElementReplacer;
 
@@ -64,7 +71,7 @@ class Html extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
+    final double width = shrinkToFit ? null : MediaQuery.of(context).size.width;
 
     if (useRichText) {
       return Container(
@@ -74,11 +81,12 @@ class Html extends StatelessWidget {
         child: DefaultTextStyle.merge(
           style: defaultTextStyle ?? Theme.of(context).textTheme.body1,
           child: HtmlRichTextParser(
-            width: width,
+            shrinkToFit: shrinkToFit,
             onLinkTap: onLinkTap,
             renderNewlines: renderNewlines,
             customEdgeInsets: customEdgeInsets,
             customTextStyle: customTextStyle,
+            customTextAlign: customTextAlign,
             html: data,
             onImageError: onImageError,
             linkStyle: linkStyle,
@@ -98,7 +106,9 @@ class Html extends StatelessWidget {
           cssData: css,
           onLinkTap: onLinkTap,
           style: style,
-          customElementReplacer: customElementReplacer,
-        ));
+          customRender: customRender,
+          blacklistedElements: blacklistedElements,
+        ),
+    );
   }
 }
