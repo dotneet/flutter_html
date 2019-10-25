@@ -49,12 +49,19 @@ const htmlData = """
         &nbsp;is Japanese Kanji
       </p>
       <table>
+      <colgroup>
+        <col width="70%" />
+      </colgroup>
+      <thead>
       <tr><th>One</th><th>Two</th><th>Three</th></tr>
+      </thead>
+      <tbody>
+      <tr><td><b>Data</b></td><td>Data</td><td>Data</td></tr>
       <tr><td>Data</td><td>Data</td><td>Data</td></tr>
       <tr><td>Data</td><td>Data</td><td>Data</td></tr>
-      <tr><td>Data</td><td>Data</td><td>Data</td></tr>
+      </tbody>
       <tfoot>
-      <tr><td>Data</td><td>Data</td><td>Data</td></tr>
+      <tr><td>fData</td><td>fData</td><td>fData</td></tr>
       </tfoot>
       </table>
       <flutter></flutter>
