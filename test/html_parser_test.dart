@@ -135,9 +135,5 @@ void testNewParser() {
         node: element,
       );
     });
-    final parser = HtmlParser.lexDomTree(
-        HtmlParser.parseHTML("<custom-tag>hoge</custom-tag>"),
-        customElementReplacer: replacer);
-    print(parser);
   });
 }
