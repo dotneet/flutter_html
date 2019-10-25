@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/html_parser.dart';
+import 'package:flutter_html/src/html_elements.dart';
 import 'package:flutter_html/src/styled_element.dart';
 import 'package:flutter_html/style.dart';
 import 'package:html/dom.dart' as dom;
@@ -27,19 +28,25 @@ class TableLayoutElement extends LayoutElement {
 
   @override
   Widget toWidget(RenderContext context) {
-
-    final colWidths = children.where((c) => c.name == "colgroup").map((group) {
-      return group.children.where((c) => c.name == "col").map((c) {
-        final widthStr = c.attributes["width"] ?? "";
-        if (widthStr.endsWith("%")) {
-          final width = double.tryParse(widthStr.substring(0, widthStr.length - 1)) * 0.01;
-          return FractionColumnWidth(width);
-        } else {
-          final width = double.tryParse(widthStr);
-          return FixedColumnWidth(width);
-        }
-      });
-    }).expand((i) => i).toList().asMap();
+    final colWidths = children
+        .where((c) => c.name == "colgroup")
+        .map((group) {
+          return group.children.where((c) => c.name == "col").map((c) {
+            final widthStr = c.attributes["width"] ?? "";
+            if (widthStr.endsWith("%")) {
+              final width =
+                  double.tryParse(widthStr.substring(0, widthStr.length - 1)) *
+                      0.01;
+              return FractionColumnWidth(width);
+            } else {
+              final width = double.tryParse(widthStr);
+              return FixedColumnWidth(width);
+            }
+          });
+        })
+        .expand((i) => i)
+        .toList()
+        .asMap();
 
     return Table(
       columnWidths: colWidths,
@@ -97,9 +104,15 @@ class TableRowLayoutElement extends LayoutElement {
 
   TableRow toTableRow(RenderContext context) {
     return TableRow(
-        children: children.map((c) {
-      return RichText(text: context.parser.parseTree(context, c));
-    }).toList());
+        children: children
+            .map((c) {
+              if (c is StyledElement && (c.name == "td" || c.name == "th")) {
+                return RichText(text: context.parser.parseTree(context, c));
+              }
+              return null;
+            })
+            .where((t) => t != null)
+            .toList());
   }
 }
 
@@ -118,14 +131,12 @@ TableStyleElement parseTableDefinitionElement(
     case "colgroup":
     case "col":
       return TableStyleElement(
-          name: element.localName,
-          children: children,
-          node: element
-      );
+          name: element.localName, children: children, node: element);
     default:
       return TableStyleElement();
   }
 }
+
 LayoutElement parseLayoutElement(
     dom.Element element, List<StyledElement> children) {
   switch (element.localName) {
@@ -146,10 +157,7 @@ LayoutElement parseLayoutElement(
       break;
     case "tr":
       return TableRowLayoutElement(
-        name: element.localName,
-        children: children,
-        node: element
-      );
+          name: element.localName, children: children, node: element);
       break;
     default:
       return TableLayoutElement(children: children);
