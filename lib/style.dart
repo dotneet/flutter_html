@@ -78,7 +78,7 @@ class Style {
     this.after,
     this.textDirection,
     this.border,
-    this.alignment = Alignment.centerLeft, //TODO
+    this.alignment,
     this.markerContent,
   });
 

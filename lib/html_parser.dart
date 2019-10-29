@@ -210,18 +210,20 @@ class HtmlParser extends StatelessWidget {
 
     //Return the correct InlineSpan based on the element type.
     if (tree.style?.display == Display.BLOCK) {
+      final style = Style(alignment: Alignment.centerLeft).merge(tree.style);
       return WidgetSpan(
         child: ContainerSpan(
           newContext: newContext,
-          style: tree.style,
+          style: style,
           children: tree.children?.map((tree) => parseTree(newContext, tree))?.toList() ?? [],
         ),
       );
     } else if(tree.style?.display == Display.LIST_ITEM) {
+      final style = Style(alignment: Alignment.centerLeft).merge(tree.style);
       return WidgetSpan(
         child: ContainerSpan(
           newContext: newContext,
-          style: tree.style,
+          style: style,
           child: Stack(
             children: <Widget>[
               PositionedDirectional(
